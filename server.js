@@ -10,7 +10,9 @@ const PORT = process.env.PORT || 3000;
 // Configuración de la conexión a la base de datos usando URL externa
 const pool = new Pool({
     connectionString: 'postgresql://minimarketplus_user:PgMv08yNE01VplusUukNrpkkGbEZgFsP@dpg-crdtnklsvqrc73fb3fpg-a.oregon-postgres.render.com/minimarketplus',
-    ssl: false    
+    ssl: {
+        rejectUnauthorized: false // Esto es necesario si tu base de datos requiere SSL
+    }
 });
 
 // Función para crear la tabla `users` si no existe
