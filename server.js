@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
@@ -36,19 +35,18 @@ const createUsersTable = async () => {
 // Llama a la función para crear la tabla al iniciar el servidor
 createUsersTable();
 
-app.get('/ping', async (req, res) => {
-    const result = await pool.query('SELECT * from users');
-    console.log(result)
-    return res.json(result.rows);
-});
-
 // Usar cors para todas las solicitudes
 app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
 
-// Resto de tu código de registro y login...
+// Check for duplicates
+const checkForDuplicates = async (username, email) => {
+    const result = await pool.query('SELECT 1 FROM users WHERE username = $1 OR email = $2 LIMIT 1', [username, email]);
+    return result.rowCount > 0;
+};
+
 // Register Endpoint
 app.post('/register', async (req, res) => {
     try {
@@ -63,10 +61,15 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Correo electrónico no válido.' });
         }
 
+        // Check for duplicates
+        if (await checkForDuplicates(username, email)) {
+            return res.status(409).json({ message: 'El nombre de usuario o el correo electrónico ya están en uso.' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await pool.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
+        await pool.query(
+            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
             [username, email, hashedPassword]
         );
 
