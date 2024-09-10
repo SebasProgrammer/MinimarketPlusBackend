@@ -109,6 +109,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/ping', async (req, res) => {
+    const result = await pool.query('SELECT * from users');
+    console.log(result)
+    return res.json(result.rows);
+});
+
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
