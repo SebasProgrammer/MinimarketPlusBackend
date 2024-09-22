@@ -115,6 +115,16 @@ app.get('/ping', async (req, res) => {
     return res.json(result.rows);
 });
 
+app.delete('/delete-users', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM users');
+        res.status(200).json({ message: 'Todos los datos de la tabla users han sido eliminados.' });
+    } catch (error) {
+        console.error('Error al eliminar datos:', error.message);
+        res.status(500).json({ message: 'Error al eliminar datos.' });
+    }
+});
+
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
