@@ -60,17 +60,27 @@ const alterUsersTable = async () => {
 createUsersTable();
 alterUsersTable();
 
-// Funciones de validación
 const validatePassword = (password) => {
     const minLength = 8;
     const maxLength = 16;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /\W/.test(password);
-    return password.length >= minLength && password.length <= maxLength &&
-           hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[\W_]/.test(password);
+    return password.length >= minLength &&
+        password.length <= maxLength &&
+        hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
 };
+
+// Función para verificar duplicados de usuario o correo
+const checkForDuplicates = async (username, email) => {
+    const result = await pool.query(
+        'SELECT 1 FROM users WHERE username = $1 OR email = $2 LIMIT 1',
+        [username, email]
+    );
+    return result.rowCount > 0;
+};
+
 
 app.post('/register', async (req, res) => {
     try {
@@ -132,13 +142,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Error en el inicio de sesión. Inténtalo de nuevo.' });
     }
 });
-
-
-// Check for duplicates
-const checkForDuplicate = async (field, value) => {
-    const result = await pool.query(`SELECT 1 FROM users WHERE ${field} = $1 LIMIT 1`, [value]);
-    return result.rowCount > 0;
-};
 
 // Configuración de Nodemailer
 const transporter = nodemailer.createTransport({
