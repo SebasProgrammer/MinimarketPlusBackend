@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Configuración de la conexión a la base de datos
 const pool = new Pool({
-    connectionString: 'postgresql://minimarketplus_user:PgMv08yNE01VplusUukNrpkkGbEZgFsP@dpg-crdtnklsvqrc73fb3fpg-a.oregon-postgres.render.com/minimarketplus',
+    connectionString: 'postgresql://minimarketplus2_user:yYJDfuB9mWrKM0Wi1pyvLbmseAZqUYRm@dpg-cs1vc2dds78s73bbpd1g-a.oregon-postgres.render.com/minimarketplus2',
     ssl: {
         rejectUnauthorized: false
     }
